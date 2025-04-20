@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media Thumbnail Resizer</title>
+    <style>
+        :root {
+            --primary-color: #ff0000;
+            --secondary-color: #282828;
+            --light-gray: #f1f1f1;
+            --dark-gray: #606060;
+            --facebook-blue: #3b5998;
+            --twitter-blue: #1DA1F2;
+            --instagram-purple: #E1306C;
+            --tiktok-black: #010101;
+            --linkedin-blue: #0077B5;
+            --pinterest-red: #E60023;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light-gray);
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        header {
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo h1 {
+            color: var(--primary-color);
+            margin-left: 10px;
+            font-size: 1.5rem;
+        }
+        
+        .logo-icon {
+            color: var(--primary-color);
+            font-size: 2rem;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 20px;
+        }
+        
+        .upload-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .upload-area {
+            border: 2px dashed var(--dark-gray);
+            border-radius: 5px;
+            padding: 3rem 1rem;
+            margin: 1rem 0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .upload-area:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(255, 0, 0, 0.05);
+        }
+        
+        .upload-area.active {
+            border-color: var(--primary-color);
+            background-color: rgba(255, 0, 0, 0.1);
+        }
+        
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #cc0000;
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .btn-outline:hover {
+            background-color: rgba(255, 0, 0, 0.1);
+        }
+        
+        .btn-facebook {
+            background-color: var(--facebook-blue);
+        }
+        
+        .btn-twitter {
+            background-color: var(--twitter-blue);
+        }
+        
+        .btn-instagram {
+            background-color: var(--instagram-purple);
+        }
+        
+        .btn-tiktok {
+            background-color: var(--tiktok-black);
+        }
+        
+        .btn-linkedin {
+            background-color: var(--linkedin-blue);
+        }
+        
+        .btn-pinterest {
+            background-color: var(--pinterest-red);
+        }
+        
+        .preview-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .preview-container {
+            flex: 1;
+            min-width: 300px;
+            background-color: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .preview-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            color: var(--secondary-color);
+        }
+        
+        .preview-title i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .preview-image-container {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            position: relative;
+            margin-top: 1rem;
+            text-align: center;
+        }
+        
+        .preview-image {
+            max-width: 100%;
+            height: auto;
+            display: none;
+            margin: 0 auto;
+        }
+        
+        .platforms-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+        
+        .platforms-title {
+            margin-bottom: 1.5rem;
+            color: var(--secondary-color);
+        }
+        
+        .platform-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .platform-card {
+            background-color: var(--light-gray);
+            border-radius: 8px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .platform-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .platform-card.active {
+            border: 2px solid var(--primary-color);
+            background-color: rgba(255, 0, 0, 0.05);
+        }
+        
+        .platform-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .facebook-icon {
+            color: var(--facebook-blue);
+        }
+        
+        .twitter-icon {
+            color: var(--twitter-blue);
+        }
+        
+        .instagram-icon {
+            color: var(--instagram-purple);
+        }
+        
+        .tiktok-icon {
+            color: var(--tiktok-black);
+        }
+        
+        .linkedin-icon {
+            color: var(--linkedin-blue);
+        }
+        
+        .pinterest-icon {
+            color: var(--pinterest-red);
+        }
+        
+        .platform-card h3 {
+            font-size: 1rem;
+            color: var(--dark-gray);
+            margin-bottom: 0.5rem;
+        }
+        
+        .platform-dimensions {
+            font-size: 0.9rem;
+            color: var(--dark-gray);
+        }
+        
+        .resize-controls {
+            background-color: white;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .control-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .control-group h3 {
+            margin-bottom: 0.8rem;
+            font-size: 1rem;
+            color: var(--dark-gray);
+        }
+        
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .slider {
+            flex: 1;
+        }
+        
+        .slider-value {
+            width: 50px;
+            text-align: center;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .drop-message {
+            margin-top: 1rem;
+            color: var(--dark-gray);
+            font-size: 0.9rem;
+        }
+        
+        .platform-preview {
+            margin-top: 1.5rem;
+            display: none;
+        }
+        
+        .platform-preview.active {
+            display: block;
+        }
+        
+        @media (max-width: 768px) {
+            .preview-section {
+                flex-direction: column;
+            }
+            
+            .platform-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <i class="fas fa-expand logo-icon"></i>
+            <h1>Social Media Thumbnail Resizer</h1>
+        </div>
+    </header>
+    
+    <div class="container">
+        <section class="upload-section">
+            <h2>Upload Your Thumbnail</h2>
+            <p>Resize your image for different social media platforms</p>
+            
+            <div id="uploadArea" class="upload-area">
+                <i class="fas fa-cloud-upload-alt" style="font-size: 3rem; color: var(--dark-gray); margin-bottom: 1rem;"></i>
+                <p>Click to upload or drag and drop</p>
+                <p class="drop-message">Supports JPG, PNG (Max 5MB)</p>
+                <input type="file" id="fileInput" accept="image/*" style="display: none;">
+            </div>
+            
+            <div id="fileName" class="hidden" style="margin-top: 1rem; font-weight: 500;"></div>
+        </section>
+        
+        <section class="preview-section">
+            <div class="preview-container">
+                <div class="preview-title">
+                    <i class="fas fa-image"></i>
+                    <h3>Original Thumbnail</h3>
+                </div>
+                <div class="preview-image-container">
+                    <img id="originalThumbnail" class="preview-image" alt="Original thumbnail">
+                    <div id="originalDimensions" style="margin-top: 1rem; font-size: 0.9rem; color: var(--dark-gray);"></div>
+                </div>
+            </div>
+            
+            <div class="preview-container">
+                <div class="preview-title">
+                    <i class="fas fa-mobile-alt"></i>
+                    <h3>Resized Preview</h3>
+                </div>
+                <div class="preview-image-container">
+                    <img id="resizedThumbnail" class="preview-image" alt="Resized thumbnail">
+                    <div id="resizedDimensions" style="margin-top: 1rem; font-size: 0.9rem; color: var(--dark-gray);"></div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="platforms-section">
+            <h2 class="platforms-title">Select Platform</h2>
+            <p>Choose a social media platform to resize your thumbnail</p>
+            
+            <div class="platform-grid">
+                <div class="platform-card" data-platform="youtube" data-width="1280" data-height="720">
+                    <div class="platform-icon">
+                        <i class="fab fa-youtube" style="color: var(--primary-color);"></i>
+                    </div>
+                    <h3>YouTube</h3>
+                    <p class="platform-dimensions">1280 × 720 pixels</p>
+                    <p class="platform-dimensions">16:9 aspect ratio</p>
+                </div>
+                
+                <div class="platform-card" data-platform="facebook" data-width="1200" data-height="630">
+                    <div class="platform-icon facebook-icon">
+                        <i class="fab fa-facebook"></i>
+                    </div>
+                    <h3>Facebook Post</h3>
+                    <p class="platform-dimensions">1200 × 630 pixels</p>
+                    <p class="platform-dimensions">1.91:1 aspect ratio</p>
+                </div>
+                
+                <div class="platform-card" data-platform="instagram" data-width="1080" data-height="1080">
+                    <div class="platform-icon instagram-icon">
+                        <i class="fab fa-instagram"></i>
+                    </div>
+                    <h3>Instagram Square</h3>
+                    <p class="platform-dimensions">1080 × 1080 pixels</p>
+                    <p class="platform-dimensions">1:1 aspect ratio</p>
+                </div>
+                
+                <div class="platform-card" data-platform="tiktok" data-width="1080" data-height="1920">
+                    <div class="platform-icon tiktok-icon">
+                        <i class="fab fa-tiktok"></i>
+                    </div>
+                    <h3>TikTok</h3>
+                    <p class="platform-dimensions">1080 × 1920 pixels</p>
+                    <p class="platform-dimensions">9:16 aspect ratio</p>
+                </div>
+                
+                <div class="platform-card" data-platform="twitter" data-width="1200" data-height="675">
+                    <div class="platform-icon twitter-icon">
+                        <i class="fab fa-twitter"></i>
+                    </div>
+                    <h3>Twitter Post</h3>
+                    <p class="platform-dimensions">1200 × 675 pixels</p>
+                    <p class="platform-dimensions">16:9 aspect ratio</p>
+                </div>
+                
+                <div class="platform-card" data-platform="linkedin" data-width="1200" data-height="627">
+                    <div class="platform-icon linkedin-icon">
+                        <i class="fab fa-linkedin"></i>
+                    </div>
+                    <h3>LinkedIn Post</h3>
+                    <p class="platform-dimensions">1200 × 627 pixels</p>
+                    <p class="platform-dimensions">1.91:1 aspect ratio</p>
+                </div>
+                
+                <div class="platform-card" data-platform="pinterest" data-width="1000" data-height="1500">
+                    <div class="platform-icon pinterest-icon">
+                        <i class="fab fa-pinterest"></i>
+                    </div>
+                    <h3>Pinterest Pin</h3>
+                    <p class="platform-dimensions">1000 × 1500 pixels</p>
+                    <p class="platform-dimensions">2:3 aspect ratio</p>
+                </div>
+                
+                <div class="platform-card" data-platform="custom" data-width="custom" data-height="custom">
+                    <div class="platform-icon">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                    <h3>Custom Size</h3>
+                    <p class="platform-dimensions">Set your own dimensions</p>
+                </div>
+            </div>
+        </section>
+        
+        <section id="customControls" class="resize-controls hidden">
+            <h2>Custom Resize Settings</h2>
+            
+            <div class="control-group">
+                <h3>Width (pixels)</h3>
+                <div class="slider-container">
+                    <input type="range" id="widthSlider" class="slider" min="100" max="3000" value="1200">
+                    <span id="widthValue" class="slider-value">1200px</span>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <h3>Height (pixels)</h3>
+                <div class="slider-container">
+                    <input type="range" id="heightSlider" class="slider" min="100" max="3000" value="630">
+                    <span id="heightValue" class="slider-value">630px</span>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <h3>Maintain Aspect Ratio</h3>
+                <label style="display: flex; align-items: center; gap: 0.5rem;">
+                    <input type="checkbox" id="maintainAspect" checked>
+                    Keep original aspect ratio
+                </label>
+            </div>
+        </section>
+        
+        <section class="platform-preview" id="platformPreviews">
+            <!-- Platform-specific previews will be inserted here -->
+        </section>
+        
+        <section class="action-buttons" style="justify-content: center;">
+            <button id="downloadBtn" class="btn btn-facebook"><i class="fas fa-download"></i> Download Resized Thumbnail</button>
+            <button id="resetBtn" class="btn btn-outline"><i class="fas fa-undo"></i> Reset</button>
+        </section>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM elements
+            const fileInput = document.getElementById('fileInput');
+            const uploadArea = document.getElementById('uploadArea');
+            const fileName = document.getElementById('fileName');
+            const originalThumbnail = document.getElementById('originalThumbnail');
+            const resizedThumbnail = document.getElementById('resizedThumbnail');
+            const originalDimensions = document.getElementById('originalDimensions');
+            const resizedDimensions = document.getElementById('resizedDimensions');
+            const platformCards = document.querySelectorAll('.platform-card');
+            const customControls = document.getElementById('customControls');
+            const widthSlider = document.getElementById('widthSlider');
+            const heightSlider = document.getElementById('heightSlider');
+            const widthValue = document.getElementById('widthValue');
+            const heightValue = document.getElementById('heightValue');
+            const maintainAspect = document.getElementById('maintainAspect');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const platformPreviews = document.getElementById('platformPreviews');
+            
+            // Current settings
+            let currentImage = null;
+            let originalWidth = 0;
+            let originalHeight = 0;
+            let targetWidth = 1200;
+            let targetHeight = 630;
+            let currentPlatform = 'facebook';
+            let aspectRatio = 1;
+            
+            // Event listeners
+            uploadArea.addEventListener('click', () => fileInput.click());
+            
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('active');
+            });
+            
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('active');
+            });
+            
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('active');
+                
+                if (e.dataTransfer.files.length) {
+                    fileInput.files = e.dataTransfer.files;
+                    handleFileUpload(e.dataTransfer.files[0]);
+                }
+            });
+            
+            fileInput.addEventListener('change', () => {
+                if (fileInput.files.length) {
+                    handleFileUpload(fileInput.files[0]);
+                }
+            });
+            
+            // Platform selection
+            platformCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    platformCards.forEach(c => c.classList.remove('active'));
+                    card.classList.add('active');
+                    
+                    const platform = card.dataset.platform;
+                    currentPlatform = platform;
+                    
+                    if (platform === 'custom') {
+                        customControls.classList.remove('hidden');
+                        updateResizedImage();
+                    } else {
+                        customControls.classList.add('hidden');
+                        targetWidth = parseInt(card.dataset.width);
+                        targetHeight = parseInt(card.dataset.height);
+                        updateResizedImage();
+                    }
+                    
+                    updatePlatformPreviews();
+                });
+            });
+            
+            // Default select Facebook
+            document.querySelector('.platform-card[data-platform="facebook"]').click();
+            
+            // Slider controls
+            widthSlider.addEventListener('input', () => {
+                targetWidth = parseInt(widthSlider.value);
+                widthValue.textContent = `${targetWidth}px`;
+                
+                if (maintainAspect.checked) {
+                    targetHeight = Math.round(targetWidth / aspectRatio);
+                    heightSlider.value = targetHeight;
+                    heightValue.textContent = `${targetHeight}px`;
+                }
+                
+                updateResizedImage();
+            });
+            
+            heightSlider.addEventListener('input', () => {
+                targetHeight = parseInt(heightSlider.value);
+                heightValue.textContent = `${targetHeight}px`;
+                
+                if (maintainAspect.checked) {
+                    targetWidth = Math.round(targetHeight * aspectRatio);
+                    widthSlider.value = targetWidth;
+                    widthValue.textContent = `${targetWidth}px`;
+                }
+                
+                updateResizedImage();
+            });
+            
+            maintainAspect.addEventListener('change', () => {
+                if (maintainAspect.checked) {
+                    aspectRatio = originalWidth / originalHeight;
+                }
+            });
+            
+            // Buttons
+            downloadBtn.addEventListener('click', downloadResizedImage);
+            resetBtn.addEventListener('click', resetAll);
+            
+            // Functions
+            function handleFileUpload(file) {
+                if (!file.type.match('image.*')) {
+                    alert('Please upload an image file (JPG, PNG)');
+                    return;
+                }
+                
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('File size exceeds 5MB limit');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentImage = new Image();
+                    currentImage.onload = function() {
+                        originalWidth = this.width;
+                        originalHeight = this.height;
+                        aspectRatio = originalWidth / originalHeight;
+                        
+                        originalThumbnail.src = e.target.result;
+                        originalThumbnail.style.display = 'block';
+                        originalDimensions.textContent = `${originalWidth} × ${originalHeight} pixels`;
+                        
+                        fileName.textContent = `Uploaded: ${file.name}`;
+                        fileName.classList.remove('hidden');
+                        
+                        // Update resized image
+                        updateResizedImage();
+                        updatePlatformPreviews();
+                    };
+                    currentImage.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+            
+            function updateResizedImage() {
+                if (!currentImage) return;
+                
+                // Create canvas for resizing
+                const canvas = document.createElement('canvas');
+                canvas.width = targetWidth;
+                canvas.height = targetHeight;
+                const ctx = canvas.getContext('2d');
+                
+                // Draw image to canvas
+                ctx.drawImage(currentImage, 0, 0, targetWidth, targetHeight);
+                
+                // Update resized thumbnail
+                resizedThumbnail.src = canvas.toDataURL('image/jpeg', 0.9);
+                resizedThumbnail.style.display = 'block';
+                resizedDimensions.textContent = `${targetWidth} × ${targetHeight} pixels`;
+            }
+            
+            function updatePlatformPreviews() {
+                if (!currentImage) return;
+                
+                platformPreviews.innerHTML = '';
+                
+                // Create preview for each platform
+                platformCards.forEach(card => {
+                    if (card.dataset.platform === 'custom') return;
+                    
+                    const platform = card.dataset.platform;
+                    const width = parseInt(card.dataset.width);
+                    const height = parseInt(card.dataset.height);
+                    
+                    // Calculate scaled dimensions to fit preview
+                    const previewWidth = 300;
+                    const previewHeight = Math.round((height / width) * previewWidth);
+                    
+                    // Create canvas for resizing
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Draw image to canvas
+                    ctx.drawImage(currentImage, 0, 0, width, height);
+                    
+                    const previewDiv = document.createElement('div');
+                    previewDiv.className = `platform-preview ${platform === currentPlatform ? 'active' : ''}`;
+                    previewDiv.innerHTML = `
+                        <div class="preview-title">
+                            <i class="fab fa-${platform} platform-icon ${platform}-icon"></i>
+                            <h3>${card.querySelector('h3').textContent} Preview</h3>
+                        </div>
+                        <div class="preview-image-container" style="max-width: ${previewWidth}px; margin: 0 auto;">
+                            <img src="${canvas.toDataURL('image/jpeg', 0.9)}" class="preview-image" style="display: block; width: 100%; height: auto;">
+                            <div style="margin-top: 1rem; font-size: 0.9rem; color: var(--dark-gray);">
+                                ${width} × ${height} pixels
+                            </div>
+                            <button class="btn btn-outline" style="margin-top: 1rem; width: 100%;" 
+                                data-width="${width}" data-height="${height}">
+                                <i class="fas fa-download"></i> Download ${width}×${height}
+                            </button>
+                        </div>
+                    `;
+                    
+                    // Add download button event
+                    previewDiv.querySelector('button').addEventListener('click', function() {
+                        downloadSpecificSize(width, height);
+                    });
+                    
+                    platformPreviews.appendChild(previewDiv);
+                });
+            }
+            
+            function downloadResizedImage() {
+                if (!resizedThumbnail.src) {
+                    alert('Please upload an image first');
+                    return;
+                }
+                
+                const link = document.createElement('a');
+                link.href = resizedThumbnail.src;
+                link.download = `thumbnail-${targetWidth}x${targetHeight}.jpg`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+            
+            function downloadSpecificSize(width, height) {
+                if (!currentImage) {
+                    alert('Please upload an image first');
+                    return;
+                }
+                
+                // Create canvas for resizing
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                
+                // Draw image to canvas
+                ctx.drawImage(currentImage, 0, 0, width, height);
+                
+                // Download
+                const link = document.createElement('a');
+                link.href = canvas.toDataURL('image/jpeg', 0.9);
+                link.download = `thumbnail-${width}x${height}.jpg`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+            
+            function resetAll() {
+                // Reset image
+                currentImage = null;
+                originalThumbnail.src = '';
+                originalThumbnail.style.display = 'none';
+                originalDimensions.textContent = '';
+                resizedThumbnail.src = '';
+                resizedThumbnail.style.display = 'none';
+                resizedDimensions.textContent = '';
+                fileName.classList.add('hidden');
+                platformPreviews.innerHTML = '';
+                
+                // Reset platform selection
+                platformCards.forEach(c => c.classList.remove('active'));
+                document.querySelector('.platform-card[data-platform="facebook"]').classList.add('active');
+                currentPlatform = 'facebook';
+                targetWidth = 1200;
+                targetHeight = 630;
+                customControls.classList.add('hidden');
+                
+                // Reset sliders
+                widthSlider.value = 1200;
+                heightSlider.value = 630;
+                widthValue.textContent = '1200px';
+                heightValue.textContent = '630px';
+            }
+        });
+    </script>
+</body>
+</html>
